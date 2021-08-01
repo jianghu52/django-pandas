@@ -3,7 +3,7 @@ from products.models import Product
 from customers.models import Customer
 from profiles.models import Profile
 from django.utils import timezone
-from .utils import gennerate_code
+from .utils import generate_code
 # Create your models here.
 
 class Position(models.Model):
@@ -33,7 +33,7 @@ class Sale(models.Model):
 
     def save(self,*args,**kwargs):
         if self.transaction_id == "":
-            self.transaction_id = gennerate_code()
+            self.transaction_id = generate_code()
         if self.created is None:
             self.created = timezone.now()
         return  super().save(*args,**kwargs)
