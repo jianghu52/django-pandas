@@ -7,6 +7,9 @@ sale aaaa
 {% block content %}
 ddddd
 {% for obj in object_list %}
-{{obj}}
+<div class="card mb-3">
+     
+    <a href="{% url 'sales:detail' obj.pk %}" class="card-body"> {{obj.transaction_id}}
+</div>
 {% endfor %}
 {% endblock content %}
