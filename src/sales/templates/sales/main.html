@@ -9,7 +9,7 @@ ddddd
 {% for obj in object_list %}
 <div class="card mb-3">
      
-    <a href="{% url 'sales:detail' obj.pk %}" class="card-body"> {{obj.transaction_id}}
+    <a href="{{obj.get_absolute_url}}" class="card-body"> {{obj.transaction_id}}
 </div>
 {% endfor %}
 {% endblock content %}
