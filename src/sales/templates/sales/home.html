@@ -13,10 +13,18 @@ home
 </form>
 <br>
 
+
 {% if sales_df %}
     {{sales_df|safe}}
     <br>
     {{positions_df|safe}}
+    <br>
+    {{merged_df|safe}}
+    <br>
+   {{df|safe}}
+   <br>
+   Chart
+   <img src="data:image/png;base64,{{chart|safe}}">
 {% else %}
     <h3> no data</h3>
 {% endif %}

@@ -4,7 +4,7 @@ from django.views.generic import ListView, DetailView
 
 from .forms import SalesSearchForm
 from .models import Sale
-from .utils import get_customer_from_id, get_salesman_from_id
+from .utils import get_customer_from_id, get_salesman_from_id, get_chart
 
 
 # Create your views here.
@@ -13,10 +13,13 @@ def home_view(request):
     form = SalesSearchForm(request.POST or None)
     sales_df = None
     positions_df = None
+    merged_df = None
+    df = None
+    chart = None
     if request.method == 'POST':
         date_from = request.POST.get('date_from')
         date_to = request.POST.get('date_to')
-        chart_types = request.POST.get('chart_type')
+        chart_type = request.POST.get('chart_type')
 
         sale_qs = Sale.objects.filter(created__date__lte=date_to, created__date__gte=date_from)
         if len(sale_qs) > 0:
@@ -25,7 +28,9 @@ def home_view(request):
             sales_df['customer_id'] = sales_df['customer_id'].apply(get_customer_from_id)
             sales_df['created'] = sales_df['created'].apply(lambda x: x.strftime('%Y-%m-%d'))
             sales_df['updated'] = sales_df['updated'].apply(lambda x: x.strftime('%Y-%m-%d'))
-            sales_df.rename({'salesman_id': 'salesman', 'customer_id': 'customer'}, axis=1, inplace=True)
+            sales_df.rename({'salesman_id': 'salesman', 'customer_id': 'customer', 'id': 'sales_id'}, axis=1,
+                            inplace=True)
+            # sales_df['sales_id'] = sales_df['id']
 
             positions_data = []
             for sale in sale_qs:
@@ -39,17 +44,27 @@ def home_view(request):
                     }
                     positions_data.append(obj)
             positions_df = pd.DataFrame(positions_data)
-            print(positions_df)
+            merged_df = pd.merge(sales_df, positions_df, on='sales_id')
+            df = merged_df.groupby('transaction_id', as_index=False)['price'].agg('sum')
+
+            chart = get_chart(chart_type, df, labels=df['transaction_id'].values)
+
             sales_df = sales_df.to_html()
             positions_df = positions_df.to_html()
-            print(sales_df)
+            merged_df = merged_df.to_html()
+            df = df.to_html()
+
         else:
             print("no data")
 
     context = {
         'form': form,
         'sales_df': sales_df,
-        'positions_df': positions_df
+        'positions_df': positions_df,
+        'merged_df': merged_df,
+        'df': df,
+        'chart': chart
+
     }
     return render(request, 'sales/home.html', context)
 
