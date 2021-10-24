@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{% load static %}
+
+{% block scripts %}
+<script src="{% static 'sales/home.js' %}" defer></script>
+{% endblock scripts %}
 {% block title %}
 home
 {% endblock title %}
@@ -8,11 +13,16 @@ home
 
 <form action="" method="POST">
 {% csrf_token %}
-{{form|crispy}}
+{{search_form|crispy}}
 <button type="submit" class="btn btn-primary">search</button>
 </form>
 <br>
 
+{% if no_data %}
+    <div class="alert alert-warning" role="alert">
+        {{no_data}}
+    </div>
+{% endif %}
 
 {% if sales_df %}
     {{sales_df|safe}}
@@ -24,8 +34,33 @@ home
    {{df|safe}}
    <br>
    Chart
-   <img src="data:image/png;base64,{{chart|safe}}">
-{% else %}
-    <h3> no data</h3>
+   <img src="data:image/png;base64,{{chart|safe}}" id='img'>
+   <br>
+   <button class="btn btn-success">report</button>
+
 {% endif %}
+<button class='btn btn-primary not-visible' id='report-btn' data-bs-toggle="modal" data-bs-target="#reportModal">
+add report
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add report</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <div id="alert-box"></div>
+        <form id= "report-form">
+            {% csrf_token %}
+            {{report_form|crispy}}
+            <button type="submit" class="btn btn-info">Save changes</button>
+        </form>
+      </div>
+     </div>
+    </div>
+  </div>
+</div>
 {% endblock content %}
