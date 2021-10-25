@@ -6,7 +6,15 @@ const id_name = document.getElementById('id_name')
 const id_remarks = document.getElementById('id_remarks')
 const csrf= document.getElementsByName('csrfmiddlewaretoken')[0].value
 const reportForm = document.getElementById('report-form')
+const alertBox = document.getElementById('alert-box')
 
+const handleAlerts = (type,msg)=>{
+    alertBox.innerHTML = `
+    <div class="alert alert-${type}" role="alert">
+        ${msg}
+    </div>
+    `
+}
 console.log(reportBtn)
 console.log(img)
 
@@ -32,10 +40,10 @@ reportBtn.addEventListener('click',()=>{
             url: '/reports/save/',
             data:formData,
             success:function(response){
-                console.log(response)
+                handleAlerts('success','report add OK')
             },
             error:function(error){
-                console.log(error)
+                handleAlerts('danger','report add error')
             },
             processData:false,
             contentType:false,
