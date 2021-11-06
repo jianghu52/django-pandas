@@ -1,10 +1,11 @@
-from django.db import models
-from django.db.models.base import Model
-from profiles.models import Profile
+from django.http import HttpResponse
 from django.http import JsonResponse
+from django.views.generic import ListView, DetailView
+from profiles.models import Profile
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 from .models import Report
 from .utils import get_report_image
-from django.views.generic import ListView,DetailView
 
 
 # Create your views here.
@@ -12,10 +13,12 @@ class ReportListView(ListView):
     model = Report
     template_name = 'reports/main.html'
 
+
 class ReportDetailView(DetailView):
     model = Report
     template_name = 'reports/detail.html'
-    
+
+
 def create_report_view(request):
     if request.is_ajax():
         name = request.POST.get('name')
@@ -32,3 +35,24 @@ def create_report_view(request):
         Report.objects.create(name=name, remarks=remarks, image=img, author=author)
         return JsonResponse({'msg': 'send'})
     return JsonResponse({'msg': 'not send ok'})
+
+
+def render_pdf_view(request):
+    template_path = 'reports/pdf.html'
+    context = {'myvar': 'this is context 2222'}
+    # 声明一个django的response，定义content_type
+    response = HttpResponse(content_type='application/pdf')
+    #如果download，设置这个属性 attachment用来表示是否保存
+    #response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+    response['Content-Disposition'] = 'filename="report.pdf"'
+    # 用render 方法将content 内容放进网页
+    temlate = get_template(template_path)
+    html = temlate.render(context)
+
+    # 声明一个pdf
+    pisa_status = pisa.CreatePDF(
+        html, dest=response
+    )
+    if pisa_status.err:
+        return HttpResponse('pdf Errors' + html)
+    return response
