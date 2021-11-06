@@ -13,6 +13,6 @@ urlpatterns = [
     path('', ReportListView.as_view(), name='main'),
     path('save/', create_report_view, name='create-report'),    
     path('<pk>/', ReportDetailView.as_view(), name='detail'),
-    path('<pk>/pdf/', render_pdf_view, name='pdfs'),
+    path('<pk>/pdf/', render_pdf_view, name='pdf'),
 
 ]
