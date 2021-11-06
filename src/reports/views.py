@@ -6,7 +6,7 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from .models import Report
 from .utils import get_report_image
-
+from django.shortcuts import render,get_object_or_404
 
 # Create your views here.
 class ReportListView(ListView):
@@ -37,9 +37,11 @@ def create_report_view(request):
     return JsonResponse({'msg': 'not send ok'})
 
 
-def render_pdf_view(request):
+def render_pdf_view(request,pk):
     template_path = 'reports/pdf.html'
-    context = {'myvar': 'this is context 2222'}
+    #obj = Report.objects.get(pk= pk)
+    obj = get_object_or_404(Report,pk=pk)
+    context = {'obj':obj}
     # 声明一个django的response，定义content_type
     response = HttpResponse(content_type='application/pdf')
     #如果download，设置这个属性 attachment用来表示是否保存
